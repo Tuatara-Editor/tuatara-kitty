@@ -41,7 +41,7 @@ for \\[kitty] and for Tuatara itself in such a kitty.")
 kitty: none as standard; (\"--hidden\") starts it unseen.")
 
 (defvar *kitty-window* nil
-  "The kitty window (its id) \\[kitty-text] and \\[kitty-input] took last.")
+  "The kitty window (its identifier) \\[kitty-text] and \\[kitty-input] took last.")
 
 (defun kitty-socket-of-environment ()
   "The socket of the kitty the editor runs in, when that is one of its own
@@ -125,8 +125,8 @@ text here, \\[kitty-input] types a line or the selection into it."
       (message "kitty opened in ~a" (abbreviated-path directory)))))
 
 (defun kitty-listed-windows (listing own)
-  "The windows LISTING, what kitty's ls answers (JSON text), names, each (ID
-TITLE DIRECTORY), the window OWN (an id, or NIL) left out."
+  "The windows LISTING, what kitty's ls answers (JSON text), names, each a list of the
+window identifier (ID), TITLE and DIRECTORY, the window OWN (an ID, or NIL) left out."
   (loop for os-window across (json-items (json-read listing))
         append (loop for tab across (json-items os-window "tabs")
                      append (loop for window across (json-items tab "windows")
@@ -135,14 +135,14 @@ TITLE DIRECTORY), the window OWN (an id, or NIL) left out."
                                   collect (list id (json-get window "title") (json-get window "cwd"))))))
 
 (defun kitty-windows (socket)
-  "The windows of the kitty at SOCKET, each (ID TITLE DIRECTORY), the editor's
-own window (when it runs there) left out."
+  "The windows of the kitty at SOCKET, each a list of the window
+identifier (ID), TITLE and DIRECTORY, the editor's own window (when it runs there) left out."
   (kitty-listed-windows (kitty-call socket '("ls"))
                         (let ((id (uiop:getenv "KITTY_WINDOW_ID")))
                           (and id (kitty-socket-of-environment) (ignore-errors (parse-integer id))))))
 
 (defun read-kitty-window (socket prompt)
-  "A window of the kitty at SOCKET, (ID TITLE DIRECTORY): the only one, else
+  "A window of the kitty at SOCKET, a list of its identifier (ID), TITLE and DIRECTORY: the only one, else
 the one chosen with PROMPT (the last taken offered first)."
   (let* ((windows (kitty-windows socket))
          (window (cond ((null windows) (error "The kitty has no window open"))
@@ -186,7 +186,8 @@ search and copy as any text. Asked which window when there are several.
 (defun kitty-sendable-p (text)
   "True when TEXT may be typed into a kitty window as it is shown: it holds no
 control character but tab and newline, so no carriage return, escape, delete
-or C1 control that would make the shell run other than the text shown."
+or C1 control (a code from 128 to 159) that would make the shell run other
+than the text shown."
   (notany (lambda (c)
             (let ((code (char-code c)))
               (and (or (< code 32) (= code 127) (<= #x80 code #x9f))
