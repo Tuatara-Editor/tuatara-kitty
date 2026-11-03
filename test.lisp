@@ -16,7 +16,7 @@
       (is equal '() (kitty::kitty-listed-windows "[]" nil))))
 
 (define-test (kitty ansi-colours)
-  (let ((pieces (tuatara.defaults::ansi-pieces
+  (let ((pieces (tuatara:ansi-pieces
                  (format nil "~c[31mred~c[0m plain ~c[1;38;2;255;0;0mbold~c[m~c]133;A~c\\ ~c[22;1;36mx~c[m"
                          #\Escape #\Escape #\Escape #\Escape #\Escape #\Escape #\Escape #\Escape))))
     (is string= "red plain bold x" (apply #'concatenate 'string (mapcar (lambda (p) (if (stringp p) p (first p))) pieces)))
@@ -25,21 +25,22 @@
     (is equal " plain " (second pieces))
     (true (member :terminal-bold (second (third pieces))))
     (true (member :|TERMINAL-FG-#FF0000| (second (third pieces))))
-    (is equal (or (tuatara.defaults::theme-terminal-colour 1) 1) (tuatara.display:face-attribute :terminal-fg-1 :fg))
     ;; as a buffer shows them: faces, all of them, and no button
-    (multiple-value-bind (text faces buttons) (tuatara.defaults::pieces-text pieces)
+    (multiple-value-bind (text faces buttons) (tuatara:pieces-text pieces)
       (is string= "red plain bold x" text)
       (is equal '() buttons)
       (true (find-if (lambda (span) (and (= 10 (first span)) (consp (third span)) (member :terminal-bold (third span)))) faces))))
   ;; colons: a curly underline, an underline's colour, a colour written 38:2::R:G:B
-  (let ((pieces (tuatara.defaults::ansi-pieces
+  (let ((pieces (tuatara:ansi-pieces
                  (format nil "~c[4:3;58:2::255:0:0mwavy~c[4:0mflat ~c[38:2::0:0:255mblue~c[0m"
                          #\Escape #\Escape #\Escape #\Escape))))
     (is equal '("wavy" (:terminal-underline)) (first pieces))
     (is equal "flat " (second pieces))
     (is equal '("blue" (:|TERMINAL-FG-#0000FF|)) (third pieces)))
   ;; a colour of 24 bits taken to the nearest of 4,096: shades close together share a face
-  (is eq (tuatara.defaults::terminal-colour-face :fg "#123457") (tuatara.defaults::terminal-colour-face :fg "#113355")))
+  (flet ((faces (text) (second (first (tuatara:ansi-pieces (format nil "~c[~am x" #\Escape text))))))
+    (true (faces "38;2;18;52;87"))
+    (is equal (faces "38;2;18;52;87") (faces "38;2;17;51;85"))))
 
 (define-test (kitty kitty-control-characters-refused)
   ;; text with a delete, a C1 control (CSI among them), a carriage return or an escape is not typed; tab and newline are
