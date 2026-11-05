@@ -1,6 +1,6 @@
 ;;;; kitty.lisp --- kitty windows the editor opens, reads and types into: M-x kitty.
 ;;;; Copyright (C) 2026 Michael A Jones.  GPL-3.0-or-later; see LICENSE.
-;;;; Needs: Tuatara 0.90.13
+;;;; Needs: Tuatara 0.90.17
 ;;;;
 ;;;; A package, not part of the editor: loaded by (load-package "kitty") in
 ;;;; the init file.
@@ -45,8 +45,9 @@ kitty: none as standard; (\"--hidden\") starts it unseen.")
 
 (defun kitty-socket-of-environment ()
   "The socket of the kitty the editor runs in, when that is one of its own
-\(\\[kitty] there opens a window beside the editor's); else NIL."
-  (let ((listen (uiop:getenv "KITTY_LISTEN_ON")))
+\(\\[kitty] there opens a window beside the editor's); else NIL. Working
+through a daemon, that is the kitty the client you work from runs in."
+  (let ((listen (program-variable "KITTY_LISTEN_ON")))
     (and listen (search "/tuatara-kitty-" listen) listen)))
 
 (defparameter *kitty-seconds* 5
@@ -79,7 +80,7 @@ else the one it opened; NIL when there is none."
   "A new socket for a kitty of the editor's own, its name random: unix:PATH,
 in your runtime folder, else, when there is none, in kitty/ of the cache
 directory; either a folder only you may enter."
-  (let ((runtime (uiop:getenv "XDG_RUNTIME_DIR")))
+  (let ((runtime (own-variable "XDG_RUNTIME_DIR")))
     (format nil "unix:~atuatara-kitty-~a"
             (if (and runtime (plusp (length runtime))) (slash-ended runtime) (private-cache-directory "kitty/"))
             (random-name))))
@@ -138,7 +139,7 @@ window identifier (ID), TITLE and DIRECTORY, the window OWN (an ID, or NIL) left
   "The windows of the kitty at SOCKET, each a list of the window
 identifier (ID), TITLE and DIRECTORY, the editor's own window (when it runs there) left out."
   (kitty-listed-windows (kitty-call socket '("ls"))
-                        (let ((id (uiop:getenv "KITTY_WINDOW_ID")))
+                        (let ((id (program-variable "KITTY_WINDOW_ID")))
                           (and id (kitty-socket-of-environment) (ignore-errors (parse-integer id))))))
 
 (defun read-kitty-window (socket prompt)

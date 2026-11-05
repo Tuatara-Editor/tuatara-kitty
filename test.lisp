@@ -120,3 +120,10 @@
                             (true (uiop:string-prefix-p "*kitty: " (tuatara.buffer:buffer-name (session-buffer editor))))))
                        (ignore-errors (kitty::kitty-call socket '("close-window" "--match" "all"))))))
             (if old (sb-posix:setenv "XDG_CONFIG_HOME" old 1) (sb-posix:unsetenv "XDG_CONFIG_HOME")))))))
+
+(define-test (kitty kitty-of-the-client)
+  ;; working through a daemon, the kitty the client runs in is the client's, not the daemon's
+  (with-environment-variable ("KITTY_LISTEN_ON" nil)
+    (let ((tuatara.runtime:*host* (make-instance 'listed-host
+                                                 :variables '("KITTY_LISTEN_ON=unix:/run/user/1/tuatara-kitty-ab12"))))
+      (is string= "unix:/run/user/1/tuatara-kitty-ab12" (kitty::kitty-socket-of-environment)))))
