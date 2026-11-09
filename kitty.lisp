@@ -1,6 +1,6 @@
 ;;;; kitty.lisp --- kitty windows the editor opens, reads and types into: M-x kitty.
 ;;;; Copyright (C) 2026 Michael A Jones.  GPL-3.0-or-later; see LICENSE.
-;;;; Needs: Tuatara 0.90.17
+;;;; Needs: Tuatara 0.90.20
 ;;;;
 ;;;; A package, not part of the editor: loaded by (load-package "kitty") in
 ;;;; the init file.
@@ -23,6 +23,10 @@
   (:documentation "kitty windows the editor opens, reads and types into: M-x kitty."))
 
 (in-package #:kitty)
+
+(declare-package-needs
+ '("kitty" "the terminal this package opens and drives" :required t :install "install kitty")
+ '("kitten" "sends kitty its commands" :required t :install "kitty 0.28 or later has it"))
 
 (define-package-setting *kitty-program* "kitty"
   "The kitty program \\[kitty] opens windows of, found on the PATH. Set it in the
