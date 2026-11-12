@@ -1,13 +1,13 @@
 ;;;; kitty.lisp --- kitty windows the editor opens, reads and types into: M-x kitty.
 ;;;; Copyright (C) 2026 Michael A Jones.  GPL-3.0-or-later; see LICENSE.
-;;;; Needs: Tuatara 0.90.20
+;;;; Needs: Tuatara 0.90.25
 ;;;;
 ;;;; A package, not part of the editor: loaded by (load-package "kitty") in
 ;;;; the init file.
 ;;;;
 ;;;; A kitty window is one of a kitty the editor starts itself, never your own
 ;;;; kitty: drawn by the graphics card, with kitty's ligatures and pictures.
-;;;; The editor talks to it over a socket of its own in a folder only you may enter,
+;;;; The editor talks to it over a socket of its own in a directory only you may enter,
 ;;;; and only there: kitty takes no request over a terminal (allow_remote_control
 ;;;; socket-only, given on its command line, which no configuration file can
 ;;;; undo), so a program run in it, or a file shown in it, cannot steer it. Its
@@ -29,8 +29,11 @@
  '("kitten" "sends kitty its commands" :required t :install "kitty 0.28 or later has it"))
 
 (define-package-setting *kitty-program* "kitty"
-  "The kitty program \\[kitty] opens windows of, found on the PATH. Set it in the
-init file after the package is loaded.")
+  "The kitty program \\[kitty] opens windows of.
+Set it in the init file after the package is loaded.
+- a name: looked for on the PATH.
+- a path: that program."
+  :values string)
 
 (defparameter *kitty-launcher*
   (package-file "tuatara-kitty")
@@ -82,8 +85,8 @@ else the one it opened; NIL when there is none."
 
 (defun kitty-new-socket ()
   "A new socket for a kitty of the editor's own, its name random: unix:PATH,
-in your runtime folder, else, when there is none, in kitty/ of the cache
-directory; either a folder only you may enter."
+in your runtime directory, else, when there is none, in kitty/ of the cache
+directory; either a directory only you may enter."
   (let ((runtime (own-variable "XDG_RUNTIME_DIR")))
     (format nil "unix:~atuatara-kitty-~a"
             (if (and runtime (plusp (length runtime))) (slash-ended runtime) (private-cache-directory "kitty/"))
@@ -153,7 +156,9 @@ the one chosen with PROMPT (the last taken offered first)."
          (window (cond ((null windows) (error "The kitty has no window open"))
                        ((null (rest windows)) (first windows))
                        (t (let ((last (find *kitty-window* windows :key #'first)))
-                            (completing-read prompt (mapcar (lambda (w) (make-candidate (format nil "~a" (second w)) :annotation (third w) :value w))
+                            (completing-read prompt (mapcar (lambda (w)
+                                                              (make-candidate (format nil "~a" (second w))
+                                                                              :annotation (third w) :value w))
                                                             (if last (cons last (remove last windows)) windows))
                                              :require-match t :keep-order t))))))
     (setf *kitty-window* (first window))
@@ -182,8 +187,11 @@ search and copy as any text. Asked which window when there are several.
          (buffer (buffer-in-mode (format nil "*kitty: ~a*" title) 'kitty-text-mode)))
     (render-pieces buffer (lambda ()
                             (multiple-value-bind (text ok)
-                                (kitty-call socket (list "get-text" "--match" (format nil "id:~d" id) "--extent" "all" "--ansi"))
-                              (if ok (ansi-pieces (string-right-trim '(#\Space #\Newline) text)) (list "The kitty window is no longer open."))))
+                                (kitty-call socket (list "get-text" "--match" (format nil "id:~d" id)
+                                                         "--extent" "all" "--ansi"))
+                              (if ok
+                                  (ansi-pieces (string-right-trim '(#\Space #\Newline) text))
+                                  (list "The kitty window is no longer open."))))
                    :point :start)
     (setf (buffer-point buffer) (buffer-size buffer))
     (show-buffer buffer)))
@@ -213,7 +221,9 @@ Asked which window when there are several."
       (error "The ~:[line~;selection~] holds control characters: not sent" selected))
     (let ((id (first (read-kitty-window socket "Type into the kitty window: "))))
       (flet ((send (text &rest options)
-               (nth-value 1 (kitty-call socket (append (list "send-text" "--match" (format nil "id:~d" id)) options (list "--stdin"))
+               (nth-value 1 (kitty-call socket (append (list "send-text" "--match" (format nil "id:~d" id))
+                                                       options
+                                                       (list "--stdin"))
                                         :input text))))
         ;; pasted, so that its lines are not run one by one; then a return of its own for the line
         (if (and (send text "--bracketed-paste=auto") (or selected (send (string #\Return))))

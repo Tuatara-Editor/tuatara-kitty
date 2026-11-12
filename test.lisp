@@ -19,7 +19,8 @@
   (let ((pieces (tuatara:ansi-pieces
                  (format nil "~c[31mred~c[0m plain ~c[1;38;2;255;0;0mbold~c[m~c]133;A~c\\ ~c[22;1;36mx~c[m"
                          #\Escape #\Escape #\Escape #\Escape #\Escape #\Escape #\Escape #\Escape))))
-    (is string= "red plain bold x" (apply #'concatenate 'string (mapcar (lambda (p) (if (stringp p) p (first p))) pieces)))
+    (is string= "red plain bold x"
+        (apply #'concatenate 'string (mapcar (lambda (p) (if (stringp p) p (first p))) pieces)))
     ;; red, a palette number; plain, no face; bold in #ff0000; the shell's marks (OSC 133) left out
     (is equal '("red" (:terminal-fg-1)) (first pieces))
     (is equal " plain " (second pieces))
@@ -29,7 +30,9 @@
     (multiple-value-bind (text faces buttons) (tuatara:pieces-text pieces)
       (is string= "red plain bold x" text)
       (is equal '() buttons)
-      (true (find-if (lambda (span) (and (= 10 (first span)) (consp (third span)) (member :terminal-bold (third span)))) faces))))
+      (true (find-if (lambda (span)
+                       (and (= 10 (first span)) (consp (third span)) (member :terminal-bold (third span))))
+                     faces))))
   ;; colons: a curly underline, an underline's colour, a colour written 38:2::R:G:B
   (let ((pieces (tuatara:ansi-pieces
                  (format nil "~c[4:3;58:2::255:0:0mwavy~c[4:0mflat ~c[38:2::0:0:255mblue~c[0m"
@@ -48,16 +51,16 @@
   (dolist (code '(127 #x9b #x80 #x9f 13 27))
     (false (kitty::kitty-sendable-p (format nil "ls /tmp/x~c" (code-char code))) "~x let through" code)))
 
-(define-test (kitty kitty-socket-in-a-private-folder)
-  ;; with no runtime folder, the socket goes in a folder only you may enter, not in /tmp
+(define-test (kitty kitty-socket-in-a-private-directory)
+  ;; with no runtime directory, the socket goes in a directory only you may enter, not in /tmp
   (let ((old (uiop:getenv "XDG_RUNTIME_DIR")))
     (sb-posix:unsetenv "XDG_RUNTIME_DIR")
     (unwind-protect
          (let* ((socket (kitty::kitty-new-socket))
-                (folder (tuatara.io:parent-path (subseq socket (length "unix:")))))
+                (directory (tuatara.io:parent-path (subseq socket (length "unix:")))))
            (true (search "/tuatara-kitty-" socket))
-           (is string= (tuatara:private-cache-directory "kitty/") folder)
-           (is = #o700 (logand #o777 (tuatara.io:stamp-mode (tuatara.io:path-stamp folder)))))
+           (is string= (tuatara:private-cache-directory "kitty/") directory)
+           (is = #o700 (logand #o777 (tuatara.io:stamp-mode (tuatara.io:path-stamp directory)))))
       (when old (sb-posix:setenv "XDG_RUNTIME_DIR" old 1)))))
 
 (define-test (kitty kitty-text-lists-windows-once)
@@ -105,19 +108,26 @@
                                 (alexandria:read-file-into-string (merge-pathnames "config/tuatara/kitty.conf" dir))))
                    (unwind-protect
                         (progn
-                          ;; the line point is on sent and run; a request over the terminal itself (not its socket) refused
+                          ;; the line point is on sent and run; a request over the terminal itself (not its
+                          ;; socket) refused
                           (run-keys "M-x k i t t y - i n p u t RET"
-                                    :text (format nil "echo tuatara-marker-$((6*7)); KITTY_LISTEN_ON= kitten @ ls > ~a 2>&1; echo exit=$? >> ~a" outside outside)
+                                    :text (format nil
+                                                  "echo tuatara-marker-$((6*7)); KITTY_LISTEN_ON= kitten @ ls > ~a 2>&1; echo exit=$? >> ~a"
+                                                  outside outside)
                                     :width 80 :height 10)
-                          (loop repeat 100 until (and (probe-file outside) (search "exit=" (alexandria:read-file-into-string outside)))
+                          (loop repeat 100
+                                until (and (probe-file outside)
+                                           (search "exit=" (alexandria:read-file-into-string outside)))
                                 do (sleep 1/20))
                           (true (search "exit=" (alexandria:read-file-into-string outside)))
                           (false (search "exit=0" (alexandria:read-file-into-string outside)))
                           ;; its text read back, colours and all
-                          (multiple-value-bind (f editor) (run-keys "M-x k i t t y - t e x t RET" :text "" :width 80 :height 10)
+                          (multiple-value-bind (f editor)
+                              (run-keys "M-x k i t t y - t e x t RET" :text "" :width 80 :height 10)
                             (declare (ignore f))
                             (true (search "tuatara-marker-42" (session-text editor)))
-                            (true (uiop:string-prefix-p "*kitty: " (tuatara.buffer:buffer-name (session-buffer editor))))))
+                            (true (uiop:string-prefix-p "*kitty: "
+                                                        (tuatara.buffer:buffer-name (session-buffer editor))))))
                        (ignore-errors (kitty::kitty-call socket '("close-window" "--match" "all"))))))
             (if old (sb-posix:setenv "XDG_CONFIG_HOME" old 1) (sb-posix:unsetenv "XDG_CONFIG_HOME")))))))
 

@@ -55,7 +55,7 @@ if [ -n "$shell" ]; then
 fi
 
 editor=${TUATARA:-tuatara}
-# its socket in your runtime folder, else in a new folder only you may enter
-folder=${XDG_RUNTIME_DIR:-$(mktemp -d)}
-socket=unix:$folder/tuatara-kitty-$(od -An -N8 -tx8 /dev/urandom | tr -d ' \n')
+# its socket in your runtime directory, else in a new directory only you may enter
+directory=${XDG_RUNTIME_DIR:-$(mktemp -d)}
+socket=unix:$directory/tuatara-kitty-$(od -An -N8 -tx8 /dev/urandom | tr -d ' \n')
 exec "$program" --detach "${hidden[@]}" "${configs[@]}" --listen-on "$socket" --directory "$PWD" "$editor" -- "$@"
