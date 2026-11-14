@@ -131,9 +131,46 @@
                        (ignore-errors (kitty::kitty-call socket '("close-window" "--match" "all"))))))
             (if old (sb-posix:setenv "XDG_CONFIG_HOME" old 1) (sb-posix:unsetenv "XDG_CONFIG_HOME")))))))
 
+(defun kitty-listening-socket (path)
+  "A socket listening at PATH, to stand for a kitty's; close it after."
+  (let ((socket (make-instance 'sb-bsd-sockets:local-socket :type :stream)))
+    (sb-bsd-sockets:socket-bind socket path)
+    (sb-bsd-sockets:socket-listen socket 1)
+    socket))
+
+(defmacro with-client-kitty ((listen) &body body)
+  "Run BODY with LISTEN as the KITTY_LISTEN_ON of the client the editor works for."
+  `(with-environment-variable ("KITTY_LISTEN_ON" nil)
+     (let ((tuatara.runtime:*host* (make-instance 'listed-host
+                                                  :variables (list (format nil "KITTY_LISTEN_ON=~a" ,listen)))))
+       ,@body)))
+
 (define-test (kitty kitty-of-the-client)
   ;; working through a daemon, the kitty the client runs in is the client's, not the daemon's
-  (with-environment-variable ("KITTY_LISTEN_ON" nil)
-    (let ((tuatara.runtime:*host* (make-instance 'listed-host
-                                                 :variables '("KITTY_LISTEN_ON=unix:/run/user/1/tuatara-kitty-ab12"))))
-      (is string= "unix:/run/user/1/tuatara-kitty-ab12" (kitty::kitty-socket-of-environment)))))
+  (with-test-directory (dir)
+    (with-environment-variable ("XDG_RUNTIME_DIR" (namestring dir))
+      (let* ((path (namestring (merge-pathnames "tuatara-kitty-ab12" dir)))
+             (socket (kitty-listening-socket path)))
+        (unwind-protect
+             (with-client-kitty ((format nil "unix:~a" path))
+               (is string= (format nil "unix:~a" path) (kitty::kitty-socket-of-environment)))
+          (sb-bsd-sockets:socket-close socket))))))
+
+(define-test (kitty kitty-socket-only-of-its-own-directory)
+  ;; a socket named like the editor's but elsewhere, or no socket, is not steered
+  (with-test-directory (dir)
+    (with-environment-variable ("XDG_RUNTIME_DIR" (namestring (merge-pathnames "runtime/" dir)))
+      (ensure-directories-exist (merge-pathnames "runtime/" dir))
+      (let* ((path (namestring (merge-pathnames "tuatara-kitty-ab12" dir)))
+             (socket (kitty-listening-socket path))
+             (plain (namestring (merge-pathnames "runtime/tuatara-kitty-cd34" dir))))
+        (alexandria:write-string-into-file "" plain)
+        (unwind-protect
+             (progn
+               (with-client-kitty ((format nil "unix:~a" path))
+                 (false (kitty::kitty-socket-of-environment)))
+               (with-client-kitty ((format nil "unix:~a" plain))
+                 (false (kitty::kitty-socket-of-environment)))
+               (with-client-kitty ("unix:/tmp/x/tuatara-kitty-ab12")
+                 (false (kitty::kitty-socket-of-environment))))
+          (sb-bsd-sockets:socket-close socket))))))

@@ -41,7 +41,8 @@ Set it in the init file after the package is loaded.
 for \\[kitty] and for Tuatara itself in such a kitty.")
 
 (defvar *kitty-socket* nil
-  "The socket of the kitty the editor started, unix:PATH, while it may run; NIL before.")
+  "The socket of the kitty the editor started, unix:PATH, while it may run; NIL
+before.")
 
 (defparameter *kitty-start-arguments* '()
   "Options given first to the launcher (*KITTY-LAUNCHER*) when \\[kitty] starts a
@@ -49,13 +50,6 @@ kitty: none as standard; (\"--hidden\") starts it unseen.")
 
 (defvar *kitty-window* nil
   "The kitty window (its identifier) \\[kitty-text] and \\[kitty-input] took last.")
-
-(defun kitty-socket-of-environment ()
-  "The socket of the kitty the editor runs in, when that is one of its own
-\(\\[kitty] there opens a window beside the editor's); else NIL. Working
-through a daemon, that is the kitty the client you work from runs in."
-  (let ((listen (program-variable "KITTY_LISTEN_ON")))
-    (and listen (search "/tuatara-kitty-" listen) listen)))
 
 (defparameter *kitty-seconds* 5
   "How long a request to kitty may take before it is given up.")
@@ -83,14 +77,33 @@ else the one it opened; NIL when there is none."
           ((kitty-alive-p *kitty-socket*) *kitty-socket*)
           (t nil))))
 
+(defun kitty-socket-directories ()
+  "The directories the sockets of the editor's own kittys are made in, each
+one only you may enter: your runtime directory, when there is one, and kitty/
+of the cache directory."
+  (let ((runtime (own-variable "XDG_RUNTIME_DIR")))
+    (append (and runtime (plusp (length runtime)) (list (slash-ended runtime)))
+            (list (private-cache-directory "kitty/")))))
+
 (defun kitty-new-socket ()
   "A new socket for a kitty of the editor's own, its name random: unix:PATH,
 in your runtime directory, else, when there is none, in kitty/ of the cache
 directory; either a directory only you may enter."
-  (let ((runtime (own-variable "XDG_RUNTIME_DIR")))
-    (format nil "unix:~atuatara-kitty-~a"
-            (if (and runtime (plusp (length runtime))) (slash-ended runtime) (private-cache-directory "kitty/"))
-            (random-name))))
+  (format nil "unix:~atuatara-kitty-~a" (first (kitty-socket-directories)) (random-name)))
+
+(defun kitty-socket-of-environment ()
+  "The socket of the kitty the editor runs in, when that is one of its own
+\(\\[kitty] there opens a window beside the editor's); else NIL. Working
+through a daemon, that is the kitty the client you work from runs in. Only a
+socket the editor could have made counts: one named tuatara-kitty-... in a
+directory of KITTY-SOCKET-DIRECTORIES, where no one else can put one."
+  (let* ((listen (program-variable "KITTY_LISTEN_ON"))
+         (path (and listen (uiop:string-prefix-p "unix:" listen) (subseq listen (length "unix:")))))
+    (and path
+         (uiop:string-prefix-p "tuatara-kitty-" (subseq path (length (parent-path path))))
+         (member (parent-path path) (kitty-socket-directories) :test #'string=)
+         (eq (path-kind path :follow nil) :socket)
+         listen)))
 
 (defun kitty-program ()
   "The kitty program, or an error when it is not installed."
@@ -133,8 +146,9 @@ text here, \\[kitty-input] types a line or the selection into it."
       (message "kitty opened in ~a" (abbreviated-path directory)))))
 
 (defun kitty-listed-windows (listing own)
-  "The windows LISTING, what kitty's ls answers (JSON text), names, each a list of the
-window identifier (ID), TITLE and DIRECTORY, the window OWN (an ID, or NIL) left out."
+  "The windows LISTING, what kitty's ls answers (JSON text), names, each a list
+of the window identifier (ID), TITLE and DIRECTORY, the window OWN (an ID, or
+NIL) left out."
   (loop for os-window across (json-items (json-read listing))
         append (loop for tab across (json-items os-window "tabs")
                      append (loop for window across (json-items tab "windows")
@@ -143,15 +157,17 @@ window identifier (ID), TITLE and DIRECTORY, the window OWN (an ID, or NIL) left
                                   collect (list id (json-get window "title") (json-get window "cwd"))))))
 
 (defun kitty-windows (socket)
-  "The windows of the kitty at SOCKET, each a list of the window
-identifier (ID), TITLE and DIRECTORY, the editor's own window (when it runs there) left out."
+  "The windows of the kitty at SOCKET, each a list of the window identifier
+\(ID), TITLE and DIRECTORY, the editor's own window (when it runs there) left
+out."
   (kitty-listed-windows (kitty-call socket '("ls"))
                         (let ((id (program-variable "KITTY_WINDOW_ID")))
                           (and id (kitty-socket-of-environment) (ignore-errors (parse-integer id))))))
 
 (defun read-kitty-window (socket prompt)
-  "A window of the kitty at SOCKET, a list of its identifier (ID), TITLE and DIRECTORY: the only one, else
-the one chosen with PROMPT (the last taken offered first)."
+  "A window of the kitty at SOCKET, a list of its identifier (ID), TITLE and
+DIRECTORY: the only one, else the one chosen with PROMPT (the last taken offered
+first)."
   (let* ((windows (kitty-windows socket))
          (window (cond ((null windows) (error "The kitty has no window open"))
                        ((null (rest windows)) (first windows))
