@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src  'self'; img-src 'self' file:; script-src 'self'; base-uri 'none'; form-action 'none'">
+<title>What kitty is &ndash; kitty Manual</title>
+<link rel="icon" href="tuatara.png">
+<link rel="stylesheet" href="manual.css">
+<script src="manual.js" defer></script>
+</head>
+<body>
+<div class="site">
+<nav class="toc" id="contents" aria-label="Contents">
+<strong>kitty Manual</strong>
+<small>for Tuatara 0.90.25 and later</small>
+<p class="tools"><a href="all.html">All on one page</a>
+<button type="button" class="theme" hidden>Dark</button></p>
+<input type="search" placeholder="Search the manual" aria-label="Search the manual">
+<ol class="chapters"><li id="nav-index"><a href="index.html">0 Contents</a></li><li id="nav-01-what-kitty-is" class="here"><a class="here" href="01-what-kitty-is.html">1 What kitty is</a><ol><li><a href="01-what-kitty-is.html#how-it-fits-together">1.1 How it fits together</a></li><li><a href="01-what-kitty-is.html#what-this-manual-covers">1.2 What this manual covers</a></li></ol></li><li id="nav-02-opening-reading-and-typing"><a href="02-opening-reading-and-typing.html">2 Opening, reading and typing into a window</a><ol><li><a href="02-opening-reading-and-typing.html#opening-a-window">2.1 Opening a window</a></li><li><a href="02-opening-reading-and-typing.html#reading-a-window">2.2 Reading a window</a></li><li><a href="02-opening-reading-and-typing.html#typing-into-a-window">2.3 Typing into a window</a></li><li><a href="02-opening-reading-and-typing.html#several-windows">2.4 Several windows</a></li></ol></li><li id="nav-03-tuatara-in-a-kitty-of-its-own"><a href="03-tuatara-in-a-kitty-of-its-own.html">3 Tuatara in a kitty of its own, and its looks</a><ol><li><a href="03-tuatara-in-a-kitty-of-its-own.html#the-launcher">3.1 The launcher</a></li><li><a href="03-tuatara-in-a-kitty-of-its-own.html#its-looks">3.2 Its looks</a></li></ol></li><li id="nav-04-safety-settings-and-limits"><a href="04-safety-settings-and-limits.html">4 Safety, settings and limits</a><ol><li><a href="04-safety-settings-and-limits.html#safety">4.1 Safety</a></li><li><a href="04-safety-settings-and-limits.html#the-setting">4.2 The setting</a></li><li><a href="04-safety-settings-and-limits.html#limits">4.3 Limits</a></li></ol></li><li id="nav-05-every-command-and-setting"><a href="05-every-command-and-setting.html">5 Every command and setting</a><ol><li><a href="05-every-command-and-setting.html#every-command">5.1 Every command</a></li><li><a href="05-every-command-and-setting.html#every-setting">5.2 Every setting</a></li></ol></li></ol>
+</nav>
+<main>
+<article>
+<div class="node"><span>Next: <a href="02-opening-reading-and-typing.html">Opening, reading and typing into a window</a></span><span>Up: <a href="index.html">Contents</a></span></div>
+<h1 id="what-kitty-is">What kitty is</h1>
+<p class="lead">A package that opens windows of the kitty terminal from Tuatara, reads their
+text into a buffer and types into them.</p>
+<p>kitty is a terminal drawn by the graphics card, with ligatures and pictures.
+This package opens its windows from the editor. A window here belongs to a
+kitty that Tuatara starts itself, never your own kitty. The editor steers it
+over a socket of its own, and only over that socket.</p>
+<p>It is a package, not part of the editor. kitty itself is by Kovid Goyal. The
+package drives it by its remote control.</p>
+<h2 id="how-it-fits-together"><span class="num">1.1</span> How it fits together</h2>
+<p>Tuatara starts a kitty with a socket of its own in your runtime directory.
+Where you have none, the socket is in a directory of Tuatara's cache that only
+you may enter. Tuatara sends its commands to that socket with <code>kitten</code>, kitty's
+own command line tool, which has been part of kitty since 0.28.</p>
+<p>Three commands do the work:</p>
+<ul>
+<li><code>M-x kitty</code> opens a window;</li>
+<li><code>M-x kitty-text</code> brings a window's text into a buffer;</li>
+<li><code>M-x kitty-input</code> types a line or the selection into a window.</li>
+</ul>
+<h2 id="what-this-manual-covers"><span class="num">1.2</span> What this manual covers</h2>
+<ul>
+<li>Chapter 2 is the use of the three commands.</li>
+<li>Chapter 3 is about running Tuatara itself in a kitty of its own, and how to
+  set the looks of the windows.</li>
+<li>Chapter 4 says what keeps a program in a window from steering kitty, and lists
+  the setting and the limits.</li>
+<li>Chapter 5 lists every command and setting.</li>
+</ul>
+<div class="node end"><span>Next: <a href="02-opening-reading-and-typing.html">Opening, reading and typing into a window</a></span><span>Up: <a href="index.html">Contents</a></span></div>
+</article>
+</main>
+</div>
+</body>
+</html>

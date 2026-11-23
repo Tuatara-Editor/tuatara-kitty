@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src  'self'; img-src 'self' file:; script-src 'self'; base-uri 'none'; form-action 'none'">
+<title>kitty Manual, all chapters</title>
+<link rel="icon" href="tuatara.png">
+<link rel="stylesheet" href="manual.css">
+<script src="manual.js" defer></script>
+</head>
+<body>
+<div class="site">
+<nav class="toc" id="contents" aria-label="Contents">
+<strong>kitty Manual</strong>
+<small>for Tuatara 0.90.25 and later</small>
+<p class="tools"><a href="index.html">By chapter</a>
+<button type="button" class="theme" hidden>Dark</button></p>
+<input type="search" placeholder="Search the manual" aria-label="Search the manual">
+<ol class="chapters"><li id="nav-index"><a href="index.html">0 Contents</a></li><li id="nav-01-what-kitty-is"><a href="#01-what-kitty-is">1 What kitty is</a><ol><li><a href="#01-what-kitty-is--how-it-fits-together">1.1 How it fits together</a></li><li><a href="#01-what-kitty-is--what-this-manual-covers">1.2 What this manual covers</a></li></ol></li><li id="nav-02-opening-reading-and-typing"><a href="#02-opening-reading-and-typing">2 Opening, reading and typing into a window</a><ol><li><a href="#02-opening-reading-and-typing--opening-a-window">2.1 Opening a window</a></li><li><a href="#02-opening-reading-and-typing--reading-a-window">2.2 Reading a window</a></li><li><a href="#02-opening-reading-and-typing--typing-into-a-window">2.3 Typing into a window</a></li><li><a href="#02-opening-reading-and-typing--several-windows">2.4 Several windows</a></li></ol></li><li id="nav-03-tuatara-in-a-kitty-of-its-own"><a href="#03-tuatara-in-a-kitty-of-its-own">3 Tuatara in a kitty of its own, and its looks</a><ol><li><a href="#03-tuatara-in-a-kitty-of-its-own--the-launcher">3.1 The launcher</a></li><li><a href="#03-tuatara-in-a-kitty-of-its-own--its-looks">3.2 Its looks</a></li></ol></li><li id="nav-04-safety-settings-and-limits"><a href="#04-safety-settings-and-limits">4 Safety, settings and limits</a><ol><li><a href="#04-safety-settings-and-limits--safety">4.1 Safety</a></li><li><a href="#04-safety-settings-and-limits--the-setting">4.2 The setting</a></li><li><a href="#04-safety-settings-and-limits--limits">4.3 Limits</a></li></ol></li><li id="nav-05-every-command-and-setting"><a href="#05-every-command-and-setting">5 Every command and setting</a><ol><li><a href="#05-every-command-and-setting--every-command">5.1 Every command</a></li><li><a href="#05-every-command-and-setting--every-setting">5.2 Every setting</a></li></ol></li></ol>
+</nav>
+<main>
+<article>
+<h1>kitty Manual</h1>
+<p class="lead">for Tuatara 0.90.25 and later, every chapter on one page</p>
+<p>This manual is written with modal editing on, first and foremost. Where a command also has a key that works with modal editing off, it is given as well, as the non-modal key.</p>
+<section class="chapter" id="01-what-kitty-is">
+<h1 id="01-what-kitty-is--what-kitty-is">What kitty is</h1>
+<p class="lead">A package that opens windows of the kitty terminal from Tuatara, reads their
+text into a buffer and types into them.</p>
+<p>kitty is a terminal drawn by the graphics card, with ligatures and pictures.
+This package opens its windows from the editor. A window here belongs to a
+kitty that Tuatara starts itself, never your own kitty. The editor steers it
+over a socket of its own, and only over that socket.</p>
+<p>It is a package, not part of the editor. kitty itself is by Kovid Goyal. The
+package drives it by its remote control.</p>
+<h2 id="01-what-kitty-is--how-it-fits-together"><span class="num">1.1</span> How it fits together</h2>
+<p>Tuatara starts a kitty with a socket of its own in your runtime directory.
+Where you have none, the socket is in a directory of Tuatara's cache that only
+you may enter. Tuatara sends its commands to that socket with <code>kitten</code>, kitty's
+own command line tool, which has been part of kitty since 0.28.</p>
+<p>Three commands do the work:</p>
+<ul>
+<li><code>M-x kitty</code> opens a window;</li>
+<li><code>M-x kitty-text</code> brings a window's text into a buffer;</li>
+<li><code>M-x kitty-input</code> types a line or the selection into a window.</li>
+</ul>
+<h2 id="01-what-kitty-is--what-this-manual-covers"><span class="num">1.2</span> What this manual covers</h2>
+<ul>
+<li>Chapter 2 is the use of the three commands.</li>
+<li>Chapter 3 is about running Tuatara itself in a kitty of its own, and how to
+  set the looks of the windows.</li>
+<li>Chapter 4 says what keeps a program in a window from steering kitty, and lists
+  the setting and the limits.</li>
+<li>Chapter 5 lists every command and setting.</li>
+</ul>
+</section>
+<section class="chapter" id="02-opening-reading-and-typing">
+<h1 id="02-opening-reading-and-typing--opening-reading-and-typing-into-a-window">Opening, reading and typing into a window</h1>
+<p class="lead">Open a kitty window, read its text, and type into it.</p>
+<h2 id="02-opening-reading-and-typing--opening-a-window"><span class="num">2.1</span> Opening a window</h2>
+<p><code>M-x kitty</code> opens a kitty window in the current buffer's directory, running
+your shell. How it opens depends on where Tuatara runs:</p>
+<ul>
+<li>when Tuatara runs in a kitty of its own (chapter 3), the window opens beside
+  the editor's, as a vertical split;</li>
+<li>when a kitty of Tuatara's is already open, the window is a new window of
+  that kitty;</li>
+<li>otherwise Tuatara starts a kitty with its first window in the directory, and
+  waits for it to answer, at most 5 seconds.</li>
+</ul>
+<p>When there is no <code>kitty</code> or no <code>kitten</code> program, the command says which one is
+missing and how to install it.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Modal</th><th>Non-modal</th><th>Command</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>none</td><td><kbd>M-x kitty</kbd></td><td><code>kitty</code></td><td>Open a kitty window in the current buffer's directory: a window of a kitty the editor starts itself, with your shell (beside the editor's window when the editor runs in such a kitty, started with kitty/tuatara-kitty).</td></tr>
+</tbody></table></div>
+<h2 id="02-opening-reading-and-typing--reading-a-window"><span class="num">2.2</span> Reading a window</h2>
+<p><code>M-x kitty-text</code> brings all the text of a kitty window, the scrollback too,
+into a buffer called <code>*kitty: TITLE*</code>, with its colours. You can move through
+it, select, search and copy as in any text. Point starts at the end, where the
+window's last line is. Press <code>r</code> there to read the window again.</p>
+<p>If the window has closed since, the buffer says so.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Modal</th><th>Non-modal</th><th>Command</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>none</td><td><kbd>M-x kitty-text</kbd></td><td><code>kitty-text</code></td><td>Bring the text of a kitty window the editor opened (M-x kitty) into a buffer, all of it, the scrollback too, with its colours: to move through, select, search and copy as any text.</td></tr>
+</tbody></table></div>
+<h2 id="02-opening-reading-and-typing--typing-into-a-window"><span class="num">2.3</span> Typing into a window</h2>
+<p><code>M-x kitty-input</code> types the selection into a window. Without a selection, it
+types the line point is on, and a return, so that the shell runs it.</p>
+<p>The text is sent as a paste (bracketed paste, where the program in the window
+asks for it), so that the lines of a selection are not run one by one. A line
+is followed by a return of its own.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Modal</th><th>Non-modal</th><th>Command</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>none</td><td><kbd>M-x kitty-input</kbd></td><td><code>kitty-input</code></td><td>Type into a kitty window the editor opened (M-x kitty) the selection, or without one the line point is on and a return, so that the shell runs it.</td></tr>
+</tbody></table></div>
+<h2 id="02-opening-reading-and-typing--several-windows"><span class="num">2.4</span> Several windows</h2>
+<p>With several windows open, <code>kitty-text</code> and <code>kitty-input</code> ask which one. The
+window used last is offered first, and each is listed with its title and its
+directory. Tuatara's own window, when the editor runs in a kitty, is left out
+of the list. With only one window, it is used without asking.</p>
+<p>If no window of Tuatara's is open, the two commands say that, and that <code>M-x
+kitty</code> opens one.</p>
+</section>
+<section class="chapter" id="03-tuatara-in-a-kitty-of-its-own">
+<h1 id="03-tuatara-in-a-kitty-of-its-own--tuatara-in-a-kitty-of-its-own-and-its-looks">Tuatara in a kitty of its own, and its looks</h1>
+<p class="lead">Run the editor itself in a kitty, and set how the windows look.</p>
+<h2 id="03-tuatara-in-a-kitty-of-its-own--the-launcher"><span class="num">3.1</span> The launcher</h2>
+<p>The package has a program, <code>tuatara-kitty</code>, in its directory:</p>
+<pre class="ex"><code class="language-sh">./tuatara-kitty [--program KITTY] [FILE...]
+</code></pre>
+<p>It runs Tuatara in a kitty of its own, editing the files given, and returns at
+once. The kitty draws the editor with its own drawing, ligatures and pictures.
+<code>M-x kitty</code> there opens windows beside the editor's. The editor it runs is the
+program named by <code>$TUATARA</code>, else <code>tuatara</code> on the <code>PATH</code>. <code>--program</code> names the
+kitty program to use, when it is not <code>kitty</code> on the <code>PATH</code>.</p>
+<p>The socket is in your runtime directory, else in a new directory that only you
+may enter.</p>
+<p>The launcher has two more forms, which <code>M-x kitty</code> and the tests use:</p>
+<ul>
+<li><code>--hidden</code> starts the kitty unseen;</li>
+<li><code>--shell DIRECTORY SOCKET</code> starts your shell in a kitty in that directory,
+  listening on that socket.</li>
+</ul>
+<h2 id="03-tuatara-in-a-kitty-of-its-own--its-looks"><span class="num">3.2</span> Its looks</h2>
+<p>A kitty of Tuatara's reads your own <code>kitty.conf</code> first, then
+<code>~/.config/tuatara/kitty.conf</code> over it. A <code>kitty.conf</code> in the directory named
+by <code>XDG_CONFIG_HOME</code> is used in place of <code>~/.config</code> when that is set.</p>
+<p>The launcher makes <code>~/.config/tuatara/kitty.conf</code> the first time, with
+examples only, each commented out. Any kitty setting can be put there. It
+applies to the windows Tuatara opens, and not to your own kitty:</p>
+<pre class="ex"># font_size 12
+# background_opacity 0.95
+# remember_window_size no
+# initial_window_width 100c
+</pre>
+<p>Remote control is not set in either file. Tuatara sets it on kitty's command
+line, and nothing in a configuration file can undo it (chapter 4).</p>
+</section>
+<section class="chapter" id="04-safety-settings-and-limits">
+<h1 id="04-safety-settings-and-limits--safety-settings-and-limits">Safety, settings and limits</h1>
+<p class="lead">What keeps a window from steering kitty, the one setting, and what the
+package does not do.</p>
+<h2 id="04-safety-settings-and-limits--safety"><span class="num">4.1</span> Safety</h2>
+<p>kitty is told what to do over a socket. Tuatara gives remote control over that
+socket alone (<code>allow_remote_control socket-only</code>), on kitty's command line.
+No configuration file can undo that. A program run in the window, or a file
+shown in it, cannot steer kitty over the terminal.</p>
+<p>Tuatara counts a socket as its own only when it is named <code>tuatara-kitty-</code> and
+something, is a socket and not a link, and is in your runtime directory or in
+the kitty directory of Tuatara's cache. Nobody else can put one there.</p>
+<p>A window runs only what you type there. A program you run in it runs as you,
+and like any such program it may reach the socket. What a window only shows,
+such as a file's escape sequences, cannot.</p>
+<p><code>kitty-input</code> refuses text it cannot type as shown. A selection or a line with
+a control character in it, other than a tab or a newline, is not sent. That
+covers a carriage return, escape and delete, and the codes from 128 to 159.
+Such a character could make the shell run something other than the text you
+see.</p>
+<h2 id="04-safety-settings-and-limits--the-setting"><span class="num">4.2</span> The setting</h2>
+<p>Set it in the package's <code>:config</code> in your init file, after the package is
+loaded:</p>
+<pre class="ex"><code class="language-lisp">(load-package &quot;kitty&quot;
+              :source &quot;https://github.com/Tuatara-Editor/tuatara-kitty&quot;
+              :config
+              (setf *kitty-program* &quot;~/.local/kitty.app/bin/kitty&quot;))
+</code></pre>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Setting</th><th>Default</th><th>Values</th><th>What it changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>*kitty-program*</code></td><td><code>&quot;kitty&quot;</code></td><td>text</td><td>The kitty program M-x kitty opens windows of.</td></tr>
+</tbody></table></div>
+<p>The editor has a setting of its own with kitty in its name, <code>*kitty-keyboard*</code>.
+It says whether Tuatara's terminal frontend reads keys by kitty's keyboard
+protocol, and is for the editor running in any terminal. It does not need this
+package and is described in Tuatara's manual.</p>
+<h2 id="04-safety-settings-and-limits--limits"><span class="num">4.3</span> Limits</h2>
+<ul>
+<li>A request to kitty is given up after 5 seconds. While Tuatara waits, it keeps
+  reading keys, and <code>C-g</code> gives up at once.</li>
+<li>Only windows of a kitty that Tuatara started are used, never those of your
+  own kitty.</li>
+<li><code>kitten</code> must be there, from kitty 0.28 or later.</li>
+</ul>
+</section>
+<section class="chapter" id="05-every-command-and-setting">
+<h1 id="05-every-command-and-setting--every-command-and-setting">Every command and setting</h1>
+<p class="lead">Each command and setting of kitty, to look one up by name.</p>
+<p>The tables are made from the program each time this manual is made, so they
+never list a command or setting that kitty does not have. The first table
+has four columns. The first two are keys: the modal keys, which work only with
+modal editing on, and the non-modal keys, which work with it off too. A command
+with no key says <kbd>M-x</kbd> and its name in the second column, because you can only
+run it by its name. The third column is the name of the command and the fourth
+says what it does.</p>
+<p>To run a command by its name, press <kbd>M-x</kbd>, type a few letters of the name and
+press <kbd>RET</kbd>. To find a command from within the editor, press <kbd>C-h f</kbd>. To find
+the command that a key runs, press <kbd>C-h k</kbd> and then the key. The editor's own
+settings and commands are in chapters 21 and 22 of its manual.</p>
+<h2 id="05-every-command-and-setting--every-command"><span class="num">5.1</span> Every command</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Modal</th><th>Non-modal</th><th>Command</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>none</td><td><kbd>M-x kitty</kbd></td><td><code>kitty</code></td><td>Open a kitty window in the current buffer's directory: a window of a kitty the editor starts itself, with your shell (beside the editor's window when the editor runs in such a kitty, started with kitty/tuatara-kitty).</td></tr>
+<tr><td>none</td><td><kbd>M-x kitty-input</kbd></td><td><code>kitty-input</code></td><td>Type into a kitty window the editor opened (M-x kitty) the selection, or without one the line point is on and a return, so that the shell runs it.</td></tr>
+<tr><td>none</td><td><kbd>M-x kitty-text</kbd></td><td><code>kitty-text</code></td><td>Bring the text of a kitty window the editor opened (M-x kitty) into a buffer, all of it, the scrollback too, with its colours: to move through, select, search and copy as any text.</td></tr>
+</tbody></table></div>
+<h2 id="05-every-command-and-setting--every-setting"><span class="num">5.2</span> Every setting</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Setting</th><th>Default</th><th>Values</th><th>What it changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>*kitty-keyboard*</code></td><td><code>:auto</code></td><td>:auto, t, nil</td><td>Whether the terminal frontend reads keys by the kitty keyboard protocol.</td></tr>
+<tr><td><code>*kitty-program*</code></td><td><code>&quot;kitty&quot;</code></td><td>text</td><td>The kitty program M-x kitty opens windows of.</td></tr>
+</tbody></table></div>
+</section>
+</article>
+</main>
+</div>
+</body>
+</html>

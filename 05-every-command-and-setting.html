@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src  'self'; img-src 'self' file:; script-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Every command and setting &ndash; kitty Manual</title>
+<link rel="icon" href="tuatara.png">
+<link rel="stylesheet" href="manual.css">
+<script src="manual.js" defer></script>
+</head>
+<body>
+<div class="site">
+<nav class="toc" id="contents" aria-label="Contents">
+<strong>kitty Manual</strong>
+<small>for Tuatara 0.90.25 and later</small>
+<p class="tools"><a href="all.html">All on one page</a>
+<button type="button" class="theme" hidden>Dark</button></p>
+<input type="search" placeholder="Search the manual" aria-label="Search the manual">
+<ol class="chapters"><li id="nav-index"><a href="index.html">0 Contents</a></li><li id="nav-01-what-kitty-is"><a href="01-what-kitty-is.html">1 What kitty is</a><ol><li><a href="01-what-kitty-is.html#how-it-fits-together">1.1 How it fits together</a></li><li><a href="01-what-kitty-is.html#what-this-manual-covers">1.2 What this manual covers</a></li></ol></li><li id="nav-02-opening-reading-and-typing"><a href="02-opening-reading-and-typing.html">2 Opening, reading and typing into a window</a><ol><li><a href="02-opening-reading-and-typing.html#opening-a-window">2.1 Opening a window</a></li><li><a href="02-opening-reading-and-typing.html#reading-a-window">2.2 Reading a window</a></li><li><a href="02-opening-reading-and-typing.html#typing-into-a-window">2.3 Typing into a window</a></li><li><a href="02-opening-reading-and-typing.html#several-windows">2.4 Several windows</a></li></ol></li><li id="nav-03-tuatara-in-a-kitty-of-its-own"><a href="03-tuatara-in-a-kitty-of-its-own.html">3 Tuatara in a kitty of its own, and its looks</a><ol><li><a href="03-tuatara-in-a-kitty-of-its-own.html#the-launcher">3.1 The launcher</a></li><li><a href="03-tuatara-in-a-kitty-of-its-own.html#its-looks">3.2 Its looks</a></li></ol></li><li id="nav-04-safety-settings-and-limits"><a href="04-safety-settings-and-limits.html">4 Safety, settings and limits</a><ol><li><a href="04-safety-settings-and-limits.html#safety">4.1 Safety</a></li><li><a href="04-safety-settings-and-limits.html#the-setting">4.2 The setting</a></li><li><a href="04-safety-settings-and-limits.html#limits">4.3 Limits</a></li></ol></li><li id="nav-05-every-command-and-setting" class="here"><a class="here" href="05-every-command-and-setting.html">5 Every command and setting</a><ol><li><a href="05-every-command-and-setting.html#every-command">5.1 Every command</a></li><li><a href="05-every-command-and-setting.html#every-setting">5.2 Every setting</a></li></ol></li></ol>
+</nav>
+<main>
+<article>
+<div class="node"><span>Previous: <a href="04-safety-settings-and-limits.html">Safety, settings and limits</a></span><span>Up: <a href="index.html">Contents</a></span></div>
+<h1 id="every-command-and-setting">Every command and setting</h1>
+<p class="lead">Each command and setting of kitty, to look one up by name.</p>
+<p>The tables are made from the program each time this manual is made, so they
+never list a command or setting that kitty does not have. The first table
+has four columns. The first two are keys: the modal keys, which work only with
+modal editing on, and the non-modal keys, which work with it off too. A command
+with no key says <kbd>M-x</kbd> and its name in the second column, because you can only
+run it by its name. The third column is the name of the command and the fourth
+says what it does.</p>
+<p>To run a command by its name, press <kbd>M-x</kbd>, type a few letters of the name and
+press <kbd>RET</kbd>. To find a command from within the editor, press <kbd>C-h f</kbd>. To find
+the command that a key runs, press <kbd>C-h k</kbd> and then the key. The editor's own
+settings and commands are in chapters 21 and 22 of its manual.</p>
+<h2 id="every-command"><span class="num">5.1</span> Every command</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Modal</th><th>Non-modal</th><th>Command</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>none</td><td><kbd>M-x kitty</kbd></td><td><code>kitty</code></td><td>Open a kitty window in the current buffer's directory: a window of a kitty the editor starts itself, with your shell (beside the editor's window when the editor runs in such a kitty, started with kitty/tuatara-kitty).</td></tr>
+<tr><td>none</td><td><kbd>M-x kitty-input</kbd></td><td><code>kitty-input</code></td><td>Type into a kitty window the editor opened (M-x kitty) the selection, or without one the line point is on and a return, so that the shell runs it.</td></tr>
+<tr><td>none</td><td><kbd>M-x kitty-text</kbd></td><td><code>kitty-text</code></td><td>Bring the text of a kitty window the editor opened (M-x kitty) into a buffer, all of it, the scrollback too, with its colours: to move through, select, search and copy as any text.</td></tr>
+</tbody></table></div>
+<h2 id="every-setting"><span class="num">5.2</span> Every setting</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Setting</th><th>Default</th><th>Values</th><th>What it changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>*kitty-keyboard*</code></td><td><code>:auto</code></td><td>:auto, t, nil</td><td>Whether the terminal frontend reads keys by the kitty keyboard protocol.</td></tr>
+<tr><td><code>*kitty-program*</code></td><td><code>&quot;kitty&quot;</code></td><td>text</td><td>The kitty program M-x kitty opens windows of.</td></tr>
+</tbody></table></div>
+<div class="node end"><span>Previous: <a href="04-safety-settings-and-limits.html">Safety, settings and limits</a></span><span>Up: <a href="index.html">Contents</a></span></div>
+</article>
+</main>
+</div>
+</body>
+</html>

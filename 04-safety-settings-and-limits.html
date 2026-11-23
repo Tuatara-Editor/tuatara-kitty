@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src  'self'; img-src 'self' file:; script-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Safety, settings and limits &ndash; kitty Manual</title>
+<link rel="icon" href="tuatara.png">
+<link rel="stylesheet" href="manual.css">
+<script src="manual.js" defer></script>
+</head>
+<body>
+<div class="site">
+<nav class="toc" id="contents" aria-label="Contents">
+<strong>kitty Manual</strong>
+<small>for Tuatara 0.90.25 and later</small>
+<p class="tools"><a href="all.html">All on one page</a>
+<button type="button" class="theme" hidden>Dark</button></p>
+<input type="search" placeholder="Search the manual" aria-label="Search the manual">
+<ol class="chapters"><li id="nav-index"><a href="index.html">0 Contents</a></li><li id="nav-01-what-kitty-is"><a href="01-what-kitty-is.html">1 What kitty is</a><ol><li><a href="01-what-kitty-is.html#how-it-fits-together">1.1 How it fits together</a></li><li><a href="01-what-kitty-is.html#what-this-manual-covers">1.2 What this manual covers</a></li></ol></li><li id="nav-02-opening-reading-and-typing"><a href="02-opening-reading-and-typing.html">2 Opening, reading and typing into a window</a><ol><li><a href="02-opening-reading-and-typing.html#opening-a-window">2.1 Opening a window</a></li><li><a href="02-opening-reading-and-typing.html#reading-a-window">2.2 Reading a window</a></li><li><a href="02-opening-reading-and-typing.html#typing-into-a-window">2.3 Typing into a window</a></li><li><a href="02-opening-reading-and-typing.html#several-windows">2.4 Several windows</a></li></ol></li><li id="nav-03-tuatara-in-a-kitty-of-its-own"><a href="03-tuatara-in-a-kitty-of-its-own.html">3 Tuatara in a kitty of its own, and its looks</a><ol><li><a href="03-tuatara-in-a-kitty-of-its-own.html#the-launcher">3.1 The launcher</a></li><li><a href="03-tuatara-in-a-kitty-of-its-own.html#its-looks">3.2 Its looks</a></li></ol></li><li id="nav-04-safety-settings-and-limits" class="here"><a class="here" href="04-safety-settings-and-limits.html">4 Safety, settings and limits</a><ol><li><a href="04-safety-settings-and-limits.html#safety">4.1 Safety</a></li><li><a href="04-safety-settings-and-limits.html#the-setting">4.2 The setting</a></li><li><a href="04-safety-settings-and-limits.html#limits">4.3 Limits</a></li></ol></li><li id="nav-05-every-command-and-setting"><a href="05-every-command-and-setting.html">5 Every command and setting</a><ol><li><a href="05-every-command-and-setting.html#every-command">5.1 Every command</a></li><li><a href="05-every-command-and-setting.html#every-setting">5.2 Every setting</a></li></ol></li></ol>
+</nav>
+<main>
+<article>
+<div class="node"><span>Previous: <a href="03-tuatara-in-a-kitty-of-its-own.html">Tuatara in a kitty of its own, and its looks</a></span><span>Next: <a href="05-every-command-and-setting.html">Every command and setting</a></span><span>Up: <a href="index.html">Contents</a></span></div>
+<h1 id="safety-settings-and-limits">Safety, settings and limits</h1>
+<p class="lead">What keeps a window from steering kitty, the one setting, and what the
+package does not do.</p>
+<h2 id="safety"><span class="num">4.1</span> Safety</h2>
+<p>kitty is told what to do over a socket. Tuatara gives remote control over that
+socket alone (<code>allow_remote_control socket-only</code>), on kitty's command line.
+No configuration file can undo that. A program run in the window, or a file
+shown in it, cannot steer kitty over the terminal.</p>
+<p>Tuatara counts a socket as its own only when it is named <code>tuatara-kitty-</code> and
+something, is a socket and not a link, and is in your runtime directory or in
+the kitty directory of Tuatara's cache. Nobody else can put one there.</p>
+<p>A window runs only what you type there. A program you run in it runs as you,
+and like any such program it may reach the socket. What a window only shows,
+such as a file's escape sequences, cannot.</p>
+<p><code>kitty-input</code> refuses text it cannot type as shown. A selection or a line with
+a control character in it, other than a tab or a newline, is not sent. That
+covers a carriage return, escape and delete, and the codes from 128 to 159.
+Such a character could make the shell run something other than the text you
+see.</p>
+<h2 id="the-setting"><span class="num">4.2</span> The setting</h2>
+<p>Set it in the package's <code>:config</code> in your init file, after the package is
+loaded:</p>
+<pre class="ex"><code class="language-lisp">(load-package &quot;kitty&quot;
+              :source &quot;https://github.com/Tuatara-Editor/tuatara-kitty&quot;
+              :config
+              (setf *kitty-program* &quot;~/.local/kitty.app/bin/kitty&quot;))
+</code></pre>
+<div class="tablewrap"><table>
+<thead>
+<tr><th>Setting</th><th>Default</th><th>Values</th><th>What it changes</th></tr>
+</thead>
+<tbody>
+<tr><td><code>*kitty-program*</code></td><td><code>&quot;kitty&quot;</code></td><td>text</td><td>The kitty program M-x kitty opens windows of.</td></tr>
+</tbody></table></div>
+<p>The editor has a setting of its own with kitty in its name, <code>*kitty-keyboard*</code>.
+It says whether Tuatara's terminal frontend reads keys by kitty's keyboard
+protocol, and is for the editor running in any terminal. It does not need this
+package and is described in Tuatara's manual.</p>
+<h2 id="limits"><span class="num">4.3</span> Limits</h2>
+<ul>
+<li>A request to kitty is given up after 5 seconds. While Tuatara waits, it keeps
+  reading keys, and <code>C-g</code> gives up at once.</li>
+<li>Only windows of a kitty that Tuatara started are used, never those of your
+  own kitty.</li>
+<li><code>kitten</code> must be there, from kitty 0.28 or later.</li>
+</ul>
+<div class="node end"><span>Previous: <a href="03-tuatara-in-a-kitty-of-its-own.html">Tuatara in a kitty of its own, and its looks</a></span><span>Next: <a href="05-every-command-and-setting.html">Every command and setting</a></span><span>Up: <a href="index.html">Contents</a></span></div>
+</article>
+</main>
+</div>
+</body>
+</html>
