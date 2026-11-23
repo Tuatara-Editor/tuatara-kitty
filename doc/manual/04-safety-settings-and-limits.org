@@ -1,0 +1,55 @@
+#+title: Safety, settings and limits
+#+language: en
+
+* Safety, settings and limits
+
+What keeps a window from steering kitty, the one setting, and what the
+package does not do.
+
+** Safety
+
+kitty is told what to do over a socket. Tuatara gives remote control over that
+socket alone (=allow_remote_control socket-only=), on kitty's command line.
+No configuration file can undo that. A program run in the window, or a file
+shown in it, cannot steer kitty over the terminal.
+
+Tuatara counts a socket as its own only when it is named =tuatara-kitty-= and
+something, is a socket and not a link, and is in your runtime directory or in
+the kitty directory of Tuatara's cache. Nobody else can put one there.
+
+A window runs only what you type there. A program you run in it runs as you,
+and like any such program it may reach the socket. What a window only shows,
+such as a file's escape sequences, cannot.
+
+=kitty-input= refuses text it cannot type as shown. A selection or a line with
+a control character in it, other than a tab or a newline, is not sent. That
+covers a carriage return, escape and delete, and the codes from 128 to 159.
+Such a character could make the shell run something other than the text you
+see.
+
+** The setting
+
+Set it in the package's =:config= in your init file, after the package is
+loaded:
+
+#+begin_src lisp
+(load-package "kitty"
+              :source "https://github.com/Tuatara-Editor/tuatara-kitty"
+              :config
+              (setf *kitty-program* "~/.local/kitty.app/bin/kitty"))
+#+end_src
+
+#+table: settings *kitty-program*
+
+The editor has a setting of its own with kitty in its name, =*kitty-keyboard*=.
+It says whether Tuatara's terminal frontend reads keys by kitty's keyboard
+protocol, and is for the editor running in any terminal. It does not need this
+package and is described in Tuatara's manual.
+
+** Limits
+
+- A request to kitty is given up after 5 seconds. While Tuatara waits, it keeps
+  reading keys, and =C-g= gives up at once.
+- Only windows of a kitty that Tuatara started are used, never those of your
+  own kitty.
+- =kitten= must be there, from kitty 0.28 or later.

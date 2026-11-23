@@ -1,0 +1,37 @@
+#+title: What kitty is
+#+language: en
+
+* What kitty is
+
+A package that opens windows of the kitty terminal from Tuatara, reads their
+text into a buffer and types into them.
+
+kitty is a terminal drawn by the graphics card, with ligatures and pictures.
+This package opens its windows from the editor. A window here belongs to a
+kitty that Tuatara starts itself, never your own kitty. The editor steers it
+over a socket of its own, and only over that socket.
+
+It is a package, not part of the editor. kitty itself is by Kovid Goyal. The
+package drives it by its remote control.
+
+** How it fits together
+
+Tuatara starts a kitty with a socket of its own in your runtime directory.
+Where you have none, the socket is in a directory of Tuatara's cache that only
+you may enter. Tuatara sends its commands to that socket with =kitten=, kitty's
+own command line tool, which has been part of kitty since 0.28.
+
+Three commands do the work:
+
+- =M-x kitty= opens a window;
+- =M-x kitty-text= brings a window's text into a buffer;
+- =M-x kitty-input= types a line or the selection into a window.
+
+** What this manual covers
+
+- Chapter 2 is the use of the three commands.
+- Chapter 3 is about running Tuatara itself in a kitty of its own, and how to
+  set the looks of the windows.
+- Chapter 4 says what keeps a program in a window from steering kitty, and lists
+  the setting and the limits.
+- Chapter 5 lists every command and setting.

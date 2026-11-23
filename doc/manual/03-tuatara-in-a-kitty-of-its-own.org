@@ -1,0 +1,49 @@
+#+title: Tuatara in a kitty of its own, and its looks
+#+language: en
+
+* Tuatara in a kitty of its own, and its looks
+
+Run the editor itself in a kitty, and set how the windows look.
+
+** The launcher
+
+The package has a program, =tuatara-kitty=, in its directory:
+
+#+begin_src sh
+./tuatara-kitty [--program KITTY] [FILE...]
+#+end_src
+
+It runs Tuatara in a kitty of its own, editing the files given, and returns at
+once. The kitty draws the editor with its own drawing, ligatures and pictures.
+=M-x kitty= there opens windows beside the editor's. The editor it runs is the
+program named by =$TUATARA=, else =tuatara= on the =PATH=. =--program= names the
+kitty program to use, when it is not =kitty= on the =PATH=.
+
+The socket is in your runtime directory, else in a new directory that only you
+may enter.
+
+The launcher has two more forms, which =M-x kitty= and the tests use:
+
+- =--hidden= starts the kitty unseen;
+- =--shell DIRECTORY SOCKET= starts your shell in a kitty in that directory,
+  listening on that socket.
+
+** Its looks
+
+A kitty of Tuatara's reads your own =kitty.conf= first, then
+=~/.config/tuatara/kitty.conf= over it. A =kitty.conf= in the directory named
+by =XDG_CONFIG_HOME= is used in place of =~/.config= when that is set.
+
+The launcher makes =~/.config/tuatara/kitty.conf= the first time, with
+examples only, each commented out. Any kitty setting can be put there. It
+applies to the windows Tuatara opens, and not to your own kitty:
+
+#+begin_example
+# font_size 12
+# background_opacity 0.95
+# remember_window_size no
+# initial_window_width 100c
+#+end_example
+
+Remote control is not set in either file. Tuatara sets it on kitty's command
+line, and nothing in a configuration file can undo it (chapter 4).

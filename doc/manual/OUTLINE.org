@@ -1,0 +1,10 @@
+#+title: kitty manual: chapters
+
+Each chapter covers one part of kitty, with its commands, keys and settings.
+The last chapter lists every command and setting, generated from the source.
+
+1. What kitty is
+2. Opening, reading and typing into a window
+3. Tuatara in a kitty of its own, and its looks
+4. Safety, settings and limits
+5. Every command and setting

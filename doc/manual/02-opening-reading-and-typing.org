@@ -1,0 +1,55 @@
+#+title: Opening, reading and typing into a window
+#+language: en
+
+* Opening, reading and typing into a window
+
+Open a kitty window, read its text, and type into it.
+
+** Opening a window
+
+=M-x kitty= opens a kitty window in the current buffer's directory, running
+your shell. How it opens depends on where Tuatara runs:
+
+- when Tuatara runs in a kitty of its own (chapter 3), the window opens beside
+  the editor's, as a vertical split;
+- when a kitty of Tuatara's is already open, the window is a new window of
+  that kitty;
+- otherwise Tuatara starts a kitty with its first window in the directory, and
+  waits for it to answer, at most 5 seconds.
+
+When there is no =kitty= or no =kitten= program, the command says which one is
+missing and how to install it.
+
+#+table: commands kitty
+
+** Reading a window
+
+=M-x kitty-text= brings all the text of a kitty window, the scrollback too,
+into a buffer called =*kitty: TITLE*=, with its colours. You can move through
+it, select, search and copy as in any text. Point starts at the end, where the
+window's last line is. Press =r= there to read the window again.
+
+If the window has closed since, the buffer says so.
+
+#+table: commands kitty-text
+
+** Typing into a window
+
+=M-x kitty-input= types the selection into a window. Without a selection, it
+types the line point is on, and a return, so that the shell runs it.
+
+The text is sent as a paste (bracketed paste, where the program in the window
+asks for it), so that the lines of a selection are not run one by one. A line
+is followed by a return of its own.
+
+#+table: commands kitty-input
+
+** Several windows
+
+With several windows open, =kitty-text= and =kitty-input= ask which one. The
+window used last is offered first, and each is listed with its title and its
+directory. Tuatara's own window, when the editor runs in a kitty, is left out
+of the list. With only one window, it is used without asking.
+
+If no window of Tuatara's is open, the two commands say that, and that =M-x
+kitty= opens one.
