@@ -15,6 +15,31 @@
       (is equal '((2 "sh é" "/b")) (kitty::kitty-listed-windows listing 1))
       (is equal '() (kitty::kitty-listed-windows "[]" nil))))
 
+(define-test (kitty titles-on-one-line)
+  ;; a window's title is set by what runs in it: its line breaks and controls never reach a question
+  (let ((offered nil))
+    (sb-int:encapsulate 'kitty::kitty-windows 'titled
+                        (lambda (function socket)
+                          (declare (ignore function socket))
+                          (kitty::kitty-listed-windows
+                           (format nil "[{\"tabs\": [{\"windows\": [{\"id\": 1, \"title\": \"sh\\ninjected\\u001b[2J\",
+                                                                   \"cwd\": \"/a\\n\\u001b[2Jb\"},
+                                                                  {\"id\": 2, \"title\": \"edit\", \"cwd\": \"/b\"}]}]}]")
+                           nil)))
+    (sb-int:encapsulate 'tuatara:completing-read 'titled
+                        (lambda (function prompt candidates &rest keys)
+                          (declare (ignore function prompt keys))
+                          (setf offered (mapcar (lambda (c) (list (tuatara.command:candidate-string c)
+                                                                  (tuatara.command:candidate-annotation c)))
+                                                candidates))
+                          nil))
+    (unwind-protect (kitty::read-kitty-window "/nowhere" "Window: ")
+      (sb-int:unencapsulate 'kitty::kitty-windows 'titled)
+      (sb-int:unencapsulate 'tuatara:completing-read 'titled))
+    (is equal '("edit" "/b") (second offered))
+    (dolist (text (first offered))
+      (false (find-if (lambda (c) (< (char-code c) 32)) text) "~s" text))))
+
 (define-test (kitty ansi-colours)
   (let ((pieces (tuatara:ansi-pieces
                  (format nil "~c[31mred~c[0m plain ~c[1;38;2;255;0;0mbold~c[m~c]133;A~c\\ ~c[22;1;36mx~c[m"

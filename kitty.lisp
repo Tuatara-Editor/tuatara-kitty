@@ -145,6 +145,11 @@ text here, \\[kitty-input] types a line or the selection into it."
             (t (kitty-start directory)))
       (message "kitty opened in ~a" (abbreviated-path directory)))))
 
+(defun kitty-one-line (text)
+  "TEXT, a title or a directory kitty names, on one line with no control
+characters; the empty string when kitty names none."
+  (if text (one-line (princ-to-string text)) ""))
+
 (defun kitty-listed-windows (listing own)
   "The windows LISTING, what kitty's ls answers (JSON text), names, each a list
 of the window identifier (ID), TITLE and DIRECTORY, the window OWN (an ID, or
@@ -154,7 +159,8 @@ NIL) left out."
                      append (loop for window across (json-items tab "windows")
                                   for id = (json-get window "id")
                                   unless (eql id own)
-                                  collect (list id (json-get window "title") (json-get window "cwd"))))))
+                                  collect (list id (kitty-one-line (json-get window "title"))
+                                                (kitty-one-line (json-get window "cwd")))))))
 
 (defun kitty-windows (socket)
   "The windows of the kitty at SOCKET, each a list of the window identifier
@@ -173,7 +179,7 @@ first)."
                        ((null (rest windows)) (first windows))
                        (t (let ((last (find *kitty-window* windows :key #'first)))
                             (completing-read prompt (mapcar (lambda (w)
-                                                              (make-candidate (format nil "~a" (second w))
+                                                              (make-candidate (second w)
                                                                               :annotation (third w) :value w))
                                                             (if last (cons last (remove last windows)) windows))
                                              :require-match t :keep-order t))))))
