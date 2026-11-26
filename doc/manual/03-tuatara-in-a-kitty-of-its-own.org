@@ -19,8 +19,9 @@ once. The kitty draws the editor with its own drawing, ligatures and pictures.
 program named by =$TUATARA=, else =tuatara= on the =PATH=. =--program= names the
 kitty program to use, when it is not =kitty= on the =PATH=.
 
-The socket is in your runtime directory, else in a new directory that only you
-may enter.
+The socket is in your runtime directory, else in =tuatara/kitty/= of your cache
+directory (=$XDG_CACHE_HOME=, else =~/.cache=), which only you may enter. Those
+are the two places =M-x kitty= trusts a socket in.
 
 The launcher has two more forms, which =M-x kitty= and the tests use:
 

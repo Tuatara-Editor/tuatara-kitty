@@ -88,6 +88,23 @@
            (is = #o700 (logand #o777 (tuatara.io:stamp-mode (tuatara.io:path-stamp directory)))))
       (when old (sb-posix:setenv "XDG_RUNTIME_DIR" old 1)))))
 
+(define-test (kitty launcher-socket-in-the-trusted-cache-directory)
+  ;; the launcher with no runtime directory puts its socket in kitty/ of the cache, where the editor looks, mode 700
+  (with-test-directory (dir)
+    (let* ((cache (namestring (merge-pathnames "cache/" dir)))
+           (said (namestring (merge-pathnames "said" dir)))
+           (stub (namestring (merge-pathnames "kitty-stub" dir)))
+           (kitty (format nil "~atuatara/kitty" cache)))
+      (alexandria:write-string-into-file (format nil "#!/bin/sh~%printf '%s\\n' \"$@\" > '~a'~%" said) stub)
+      (sb-posix:chmod stub #o700)
+      (uiop:run-program (list "env" "-u" "XDG_RUNTIME_DIR" (format nil "XDG_CACHE_HOME=~a" cache)
+                              (format nil "XDG_CONFIG_HOME=~aconfig" (namestring dir))
+                              "bash" (namestring kitty::*kitty-launcher*) "--program" stub "a.txt"))
+      (let ((socket (find-if (lambda (line) (uiop:string-prefix-p "unix:" line))
+                             (uiop:read-file-lines said))))
+        (true (uiop:string-prefix-p (format nil "unix:~a/tuatara-kitty-" kitty) socket) "socket ~s" socket)
+        (is = #o700 (logand #o777 (tuatara.io:stamp-mode (tuatara.io:path-stamp kitty))))))))
+
 (define-test (kitty kitty-text-lists-windows-once)
   ;; bringing a window's text in asks kitty for its windows once, beside the check that it answers
   (let ((asked 0) (kept (fdefinition 'kitty::kitty-call)))

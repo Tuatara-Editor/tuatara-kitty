@@ -44,7 +44,7 @@ loaded:
 The editor has a setting of its own with kitty in its name, =*kitty-keyboard*=.
 It says whether Tuatara's terminal frontend reads keys by kitty's keyboard
 protocol, and is for the editor running in any terminal. It does not need this
-package and is described in Tuatara's manual.
+package and is described in Tuatara's manual, chapter 17, "The terminal".
 
 ** Limits
 
